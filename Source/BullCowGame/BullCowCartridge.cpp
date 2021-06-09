@@ -65,30 +65,30 @@ void UBullCowCartridge::ProcessGuess(FString Guess)
         return;
     }
   //Check If is  Isogram
-    if (!IsIsogram(Guess))
-    {
+     if (!IsIsogram(Guess))
+        {
         //PrintLine(TEXT("No repeating letters, guess again"));
         return;
-    }
+        }
     
     //Check Right Number Characters
     if (HiddenWord.Len()!=Guess.Len())
-    {
+        {
         PrintLine(TEXT("The HiddenWord has %i characters!, Try again!"),HiddenWord.Len());
         return;
-     }
+        }
     
     //Remove Life
     PrintLine(TEXT("Lost a life!"));
     --Lives;
 
     if (Lives<=0)
-    {
+        {
         PrintLine(TEXT("You have no lives left!"));
         PrintLine(TEXT("The hidden word was: %s"), *HiddenWord);
         //EndGame();
         return;
-    }
+        }
 
     //Show the player Bulls & Cows
     PrintLine(TEXT("Guess again, you have %i lives left"), Lives);
@@ -96,35 +96,21 @@ void UBullCowCartridge::ProcessGuess(FString Guess)
             
 }
 
-bool UBullCowCartridge::IsIsogram(FString Word)
+bool UBullCowCartridge::IsIsogram(FString Word) const
 {
-    int32 i=0;
-    int32 j=0;
-
-    while( i < Word.Len())
+    //Comparison check matrix.
+    for (int32 Index=0; Index<Word.Len(); ++Index)
     {
-        if (i==j)
+        for (int32 Comparison=Index+1; Comparison<Word.Len(); ++Comparison)
         {
-            ++j;
-            
-        }
-        while( j < Word.Len())
-        {
-            if (Word[i]==Word[j])
+            if (Word[Index]==Word[Comparison])
             {
-               PrintLine(TEXT("You're repeating %c"),Word[j]);
+                PrintLine(TEXT("The word has to be an Isogram!, the character %c is repeating!!"), Word[Comparison]);
                 return false;
             }
-            else
-            {
-                ++j;
-            }
-            
+
         }
-    ++i;
-    j=0;//Reinicio contador
 
     }
 return true;
-
 }
