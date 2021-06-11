@@ -2,18 +2,15 @@
 #include "BullCowCartridge.h"
 #include "HiddenWordList.h"
 
+
+
 void UBullCowCartridge::BeginPlay() // When the game starts
 {
     Super::BeginPlay();
     
+    
     SetupGame();
-    PrintLine((TEXT("The HiddenWord is: %s"), *HiddenWord)); //Debug Line
-    PrintLine(TEXT("The number of possible words is: %i"), Words.Num());
-    
-    
-    PrintLine(TEXT("The number of valid words is: %i"),GetValidWords(Words).Num());
-   
-
+  
 }
 
 void UBullCowCartridge::OnInput(const FString& Input) // When the player hits enter
@@ -21,8 +18,7 @@ void UBullCowCartridge::OnInput(const FString& Input) // When the player hits en
      //if game is over then do ClearScreen and Setup the game
     if (bGameOver)
     {
-        PrintLine(TEXT("Cleaning screen...\nNew game..."));
-        //ClearScreen();
+                  
         SetupGame();
     }
     else
@@ -39,41 +35,51 @@ void UBullCowCartridge::SetupGame()
     //Set lives
     Lives = HiddenWord.Len();
     bGameOver=false;
-
+    
     //Welcoming the player
+    ClearScreen();
     PrintLine(TEXT("Welcome to Bulls and Cows Game!!"));
     PrintLine(TEXT("Guess the  %i letter isometric word!"), HiddenWord.Len());
     PrintLine(TEXT("You've %i lives."),Lives);
     PrintLine(TEXT("Type in your guess.\nPress enter to continue..."));
 
-    const TCHAR HW[]=TEXT ("cake");
-    PrintLine(TEXT("The character 1 of the hidden word is: %c"), HW[0]);
+    //const TCHAR HW[]=TEXT ("cake");
+    //PrintLine(TEXT("The character 1 of the hidden word is: %c"), HW[0]);
 
+     PrintLine(TEXT("The Random number is: %i"),FMath::RandRange(0 , 10));
+   
+    
+    //PrintLine((TEXT("The HiddenWord is: %s"), *HiddenWord)); //Debug Line
+   PrintLine(TEXT("The number of possible words is: %i"), Words.Num()); 
+   PrintLine(TEXT("The number of valid words is: %i"),GetValidWords(Words).Num());
         
 }
 
 void UBullCowCartridge::EndGame()
 {
     bGameOver=true;
+
+    PrintLine(TEXT("*************** GAME OVER ************"));
     PrintLine(TEXT("Press enter to play again..."));
-    ClearScreen();
+    
     
     
 }
 
-void UBullCowCartridge::ProcessGuess(FString Guess)
+void UBullCowCartridge::ProcessGuess(const FString& Guess)
 {
 
-  if (HiddenWord == Guess)
-    {
-        PrintLine(TEXT("******** You have won!!********"));
-       // EndGame();
-        return;
-    }
+    if (HiddenWord == Guess)
+        {
+            bGameOver=true;
+            PrintLine(TEXT("******** You have won!!********"));
+            PrintLine(TEXT("Press enter to play again..."));
+            return;
+        }
   //Check If is  Isogram
      if (!IsIsogram(Guess))
         {
-        //PrintLine(TEXT("No repeating letters, guess again"));
+        PrintLine(TEXT("The word has to be an Isogram!"));
         return;
         }
     
@@ -92,7 +98,7 @@ void UBullCowCartridge::ProcessGuess(FString Guess)
         {
         PrintLine(TEXT("You have no lives left!"));
         PrintLine(TEXT("The hidden word was: %s"), *HiddenWord);
-        //EndGame();
+        EndGame();
         return;
         }
 
@@ -102,16 +108,16 @@ void UBullCowCartridge::ProcessGuess(FString Guess)
             
 }
 
-bool UBullCowCartridge::IsIsogram(FString Word) const
+bool UBullCowCartridge::IsIsogram(const FString& Word) const
 {
     //Comparison check matrix.
-    for (int32 Index=0; Index<Word.Len(); ++Index)
+    for (int32 Index=0; Index<Word.Len(); Index++)
     {
-        for (int32 Comparison=Index+1; Comparison<Word.Len(); ++Comparison)
+        for (int32 Comparison=Index+1; Comparison<Word.Len(); Comparison++)
         {
             if (Word[Index]==Word[Comparison])
             {
-                PrintLine(TEXT("The word has to be an Isogram!, the character %c is repeating!!"), Word[Comparison]);
+                
                 return false;
             }
 
@@ -122,16 +128,26 @@ return true;
 }
 
 
-TArray<FString> UBullCowCartridge::GetValidWords(TArray<FString> WordlList) const
+TArray<FString> UBullCowCartridge::GetValidWords(const TArray<FString>& WordList) const
 {
     TArray <FString> ValidWords;
     
-    for (int32 Index=0; Index<WordlList.Num(); Index++)
+       for (FString WordCheck : WordList)
     {
-        if (WordlList[Index].Len()>=4 && WordlList[Index].Len()<=8 && IsIsogram(Words[Index])) //&& IsIsogram (CheckingWord[Index]))
+        if (WordCheck.Len()>=4 && WordCheck.Len()<=8 && IsIsogram(WordCheck) )
         {
-            ValidWords.Emplace(WordlList[Index]);
+            ValidWords.Emplace(WordCheck);
         }
-    }
+    } 
     return ValidWords;
+    
+    /* 
+    for (int32 Index=0; Index<WordList.Num(); Index++)
+    {
+        if (WordList[Index].Len()>=4 && WordList[Index].Len()<=8 && IsIsogram(Words[Index])) //&& IsIsogram (CheckingWord[Index]))
+        {
+            ValidWords.Emplace(WordList[Index]);
+        }
+    } 
+    return ValidWords;*/
 }
